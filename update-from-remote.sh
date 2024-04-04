@@ -5,7 +5,6 @@
 # whether there has been an update on the remote. If the remote has
 # been updated, downloads the updated file and moves the outdated
 # local copy to an archive folder hosted on Dropbox.
-DBPUSH=false
 
 while getopts "u:d:" flag; do
  case $flag in
@@ -17,8 +16,6 @@ while getopts "u:d:" flag; do
    # Dropbox App Access Token
    DBTOKEN="$OPTARG"
    ;;
-   p)
-   DBPUSH=true
  esac
 done
 
@@ -72,7 +69,7 @@ if [ "$UPDATE" -eq 1 ]; then
             mv "$MOD_LAST_EP-$FILENAME" "archive/$MOD_LAST_EP-$FILENAME"
         fi
     } && {
-        if [ "$DBPUSH" = true ]; then
+        if [[-z "$DBTOKEN"]]; then
             echo "Pushing to Dropbox archive."
             curl -X POST https://content.dropboxapi.com/2/files/upload \
                 --header "Authorization: Bearer $DBTOKEN" \
