@@ -29,7 +29,7 @@ if [ ! -f "$LOG_CSV" ]; then
     UPDATE=1
     FIRSTRUN=1
     echo "$LOG_CSV does not exist. Creating...";
-    echo "url,date,date_ep,failure,mod,mod_ep,update" >> $LOG_CSV
+    echo "url,date,date_ep,mod,mod_ep,update" >> $LOG_CSV
 fi
 
 CURL=$(curl -s -v -X HEAD "$URL" 2>&1)
@@ -80,5 +80,5 @@ if [ "$UPDATE" -eq 1 ]; then
     }
 fi
 
-echo "$URL,$DATE,$DATE_EP,1,$MOD,$MOD_EP,$UPDATE" >> $LOG_CSV
+echo "$URL,$DATE,$DATE_EP,$MOD,$MOD_EP,$UPDATE" >> $LOG_CSV
 
