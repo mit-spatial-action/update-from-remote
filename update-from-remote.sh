@@ -6,6 +6,8 @@
 # been updated, downloads the updated file and moves the outdated
 # local copy to an archive folder.
 
+URL=''
+
 while getopts "u:" flag; do
  case $flag in
    u)
@@ -14,6 +16,11 @@ while getopts "u:" flag; do
    ;;
  esac
 done
+
+if [[ -z "$URL" ]]; then
+    echo "You must provide a remote file URL."
+    exit 1
+fi
 
 echo "Grabbing modified dates from remote file using HEAD request."
 
