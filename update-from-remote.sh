@@ -1,20 +1,16 @@
 #!/bin/sh
 
-# This script checks the last modified date of a remote file and
-# checks it against previously logged downloads in order to determine
+# Checks the last modified date of a remote file and
+# compares it to previously logged downloads in order to determine
 # whether there has been an update on the remote. If the remote has
 # been updated, downloads the updated file and moves the outdated
-# local copy to an archive folder hosted on Dropbox.
+# local copy to an archive folder.
 
-while getopts "u:d:" flag; do
+while getopts "u:" flag; do
  case $flag in
    u)
    # URL of remote file.
    URL="$OPTARG"
-   ;;
-   d)
-   # Dropbox App Access Token
-   DBTOKEN="$OPTARG"
    ;;
  esac
 done
@@ -47,7 +43,7 @@ MOD=$("$CURL" 2>&1 | sed -n -e 's/< Last-Modified\: .*\, //p' | tr -d "\t\n\r")
 MOD_EP=$(date -d "$MOD" "+%s")
 
 CSV_LINES=$(wc -l < "$LOG_CSV" | xargs)
-MOD_LAST_EP=$(tail -1 "$LOG_CSV" | awk -F',' '{print $6}')
+MOD_LAST_EP=$(tail -1 "$LOG_CSV" | awk -F',' '{print $5}')
 
 if [ "$CSV_LINES" -eq 1 ]; then
     echo "No prior successful runs. Downloading file, modified on $MOD."
@@ -64,18 +60,10 @@ if [ "$UPDATE" -eq 1 ]; then
     echo "Downloading updated file."
     { 
         curl -o "$MOD_EP-$FILENAME" "$URL"
+        # Move outdated file to archive folder.
         if [ -f "$MOD_LAST_EP-$FILENAME" ]; then
             mkdir -p 'archive'
             mv "$MOD_LAST_EP-$FILENAME" "archive/$MOD_LAST_EP-$FILENAME"
-        fi
-    } && {
-        if [[ -z "$DBTOKEN" ]]; then
-            echo "Pushing to Dropbox archive."
-            curl -X POST https://content.dropboxapi.com/2/files/upload \
-                --header "Authorization: Bearer $DBTOKEN" \
-                --header "Dropbox-API-Arg: {\"path\": \"/Archive/$MOD_EP-$FILENAME\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
-                --header "Content-Type: application/octet-stream" \
-                --data-binary @"$MOD_EP-$FILENAME"
         fi
     }
 fi
