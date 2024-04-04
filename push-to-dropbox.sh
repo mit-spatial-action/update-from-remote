@@ -37,7 +37,9 @@ filename=$(basename "$file")
 
 mb=$(du -m "$file" | grep -o -E "^[0-9]+")
 
-if [ mb -ge 150 ]; then
+echo "$mb"
+
+if [ "$mb" -ge 150 ]; then
     echo "File is larger than Dropbox's payload limit for upload endpoint. Splitting file and starting upload session." 
 
     split --bytes=150M "$file" chunk
@@ -56,7 +58,7 @@ if [ mb -ge 150 ]; then
         --header "Authorization: Bearer $dbtoken" \
         --header "Dropbox-API-Arg: {\"close\":false,\"cursor\":{\"offset\":$offset,\"session_id\":\"$session_id\"}}" \
         --header "Content-Type: application/octet-stream" \
-        --data-binary @"$chunk"
+        --data-binary @"$chunk" &>/dev/null
     chunk_size=$(du -b "$chunk" | grep -o -E "^[0-9]+")
     offset=$((offset+chunk_size))
     done
@@ -65,7 +67,7 @@ if [ mb -ge 150 ]; then
     curl -X POST https://content.dropboxapi.com/2/files/upload_session/finish \
         --header "Authorization: Bearer $dbtoken" \
         --header "Dropbox-API-Arg: {\"commit\":{\"autorename\":true,\"mode\":\"add\",\"mute\":false,\"path\":\"/$out_path/$filename\",\"strict_conflict\":false},\"cursor\":{\"offset\":$offset,\"session_id\":\"$session_id\"}}" \
-        --header "Content-Type: application/octet-stream"
+        --header "Content-Type: application/octet-stream" &>/dev/null
     echo "Cleaning up split file."
     rm chunk*
 else
@@ -74,6 +76,5 @@ else
         --header "Authorization: Bearer $dbtoken" \
         --header "Dropbox-API-Arg: {\"path\": \"/$out_path/$filename\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
         --header "Content-Type: application/octet-stream" \
-        --data-binary @"$file"
+        --data-binary @"$file" &>/dev/null
 fi
-
