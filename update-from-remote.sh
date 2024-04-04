@@ -5,6 +5,7 @@
 # whether there has been an update on the remote. If the remote has
 # been updated, downloads the updated file and moves the outdated
 # local copy to an archive folder hosted on Dropbox.
+DBPUSH = false
 
 while getopts "u:d:" flag; do
  case $flag in
@@ -16,6 +17,8 @@ while getopts "u:d:" flag; do
    # Dropbox App Access Token
    DBTOKEN="$OPTARG"
    ;;
+   p)
+   DBPUSH=true
  esac
 done
 
@@ -59,7 +62,7 @@ else
     UPDATE=0
 fi
 
-if [ $UPDATE -eq 1 ]; then
+if [ "$UPDATE" -eq 1 ]; then
     echo "Downloading updated file."
     { 
         curl -o "$MOD_EP-$FILENAME" "$URL"
@@ -68,12 +71,14 @@ if [ $UPDATE -eq 1 ]; then
             mv "$MOD_LAST_EP-$FILENAME" "archive/$MOD_LAST_EP-$FILENAME"
         fi
     } && {
-        echo "Pushing to Dropbox archive."
-        curl -X POST https://content.dropboxapi.com/2/files/upload \
-            --header "Authorization: Bearer $DBTOKEN" \
-            --header "Dropbox-API-Arg: {\"path\": \"/Archive/$MOD_EP-$FILENAME\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
-            --header "Content-Type: application/octet-stream" \
-            --data-binary @"$MOD_EP-$FILENAME"
+        if [ "$DBPUSH" = true]; then
+            echo "Pushing to Dropbox archive."
+            curl -X POST https://content.dropboxapi.com/2/files/upload \
+                --header "Authorization: Bearer $DBTOKEN" \
+                --header "Dropbox-API-Arg: {\"path\": \"/Archive/$MOD_EP-$FILENAME\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
+                --header "Content-Type: application/octet-stream" \
+                --data-binary @"$MOD_EP-$FILENAME"
+        fi
     }
 fi
 
