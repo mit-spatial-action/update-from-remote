@@ -3,37 +3,70 @@
 # This script pushes file with the most recent modified date to Dropbox.
 # Requires a Dropbox Application Access Token.
 
-DBTOKEN=''
+dbtoken=''
+out_path=''
 
-while getopts "d:" flag; do
+while getopts "d:o:" flag; do
     case $flag in
         d)
         # Dropbox App Access Token
-        DBTOKEN="$OPTARG"
+        dbtoken="$OPTARG"
+        ;;
+        o)
+        out_path="$OPTARG"
         ;;
     esac
 done
 
-if [[ -z "$DBTOKEN" ]]; then
+if [[ -z "$dbtoken" ]]; then
     echo "You must provide a Dropbox Application Access Token."
     exit 1
 fi
 
-LOG_CSV="log.csv"
+log_csv="log.csv"
 
-MOD_LAST_EP=$(tail -1 "$LOG_CSV" | awk -F',' '{print $5}')
+mod_last_ep=$(tail -1 "$log_csv" | awk -F',' '{print $5}')
 
-FILE=$(find . -type f -iname "$MOD_LAST_EP*")
+file=$(find . -type f -iname "$mod_last_ep*")
 
-MB=$(du -m "$FILE" | grep -o -E "^[0-9]+")
+mb=$(du -m "$file" | grep -o -E "^[0-9]+")
 
-if [ MB > 150 ]; then
-    split $FILE
+if [ mb > 150 ]; then
+    echo "File is larger than Dropbox's payload limit for upload endpoint. Splitting file and starting upload session." 
+    split --bytes=150M "$file" chunk
+    chunklist=($(ls chunk* | sort -d))
+
+    # Open an upload session with first chunk...
+    session_id=$(curl -X POST https://content.dropboxapi.com/2/files/upload_session/start \
+        --header "Authorization: Bearer $dbtoken" \
+        --header "Dropbox-API-Arg: {\"close\":false}" \
+        --header "Content-Type: application/octet-stream" \
+        --data-binary @"${chunklist[0]}") | grep -o '"session_id":"[^"]*' | grep -o '[^"]*$'
+
+    for item in ${chunklist[@]:1:${#chunklist[@]}-1}
+    do
+    curl -X POST https://content.dropboxapi.com/2/files/upload_session/append_v2 \
+        --header "Authorization: Bearer $dbtoken" \
+        --header "Dropbox-API-Arg: {\"close\":false,\"cursor\":{\"offset\":0,\"session_id\":\"$session_id\"}}" \
+        --header "Content-Type: application/octet-stream" \
+        --data-binary @"$item"
+    done
+    # Close upload session with final chunk.
+    curl -X POST https://content.dropboxapi.com/2/files/upload_session/finish \
+        --header "Authorization: Bearer $dbtoken" \
+        --header "Dropbox-API-Arg: {\"commit\":{\"autorename\":true,\"mode\":\"add\",\"mute\":false,\"path\":\"/$out_path/$file\",\"strict_conflict\":false},\"cursor\":{\"offset\":0,\"session_id\":\"$session_id\"}}" \
+        --header "Content-Type: application/octet-stream" \
+        --data-binary @"${chunklist[-1]}"
+else
+    echo "Pushing to Dropbox archive."
+    curl -X POST https://content.dropboxapi.com/2/files/upload \
+        --header "Authorization: Bearer $dbtoken" \
+        --header "Dropbox-API-Arg: {\"path\": \"/$out_path/$file\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
+        --header "Content-Type: application/octet-stream" \
+        --data-binary @"$file"
 fi
 
-# echo "Pushing to Dropbox archive."
-# curl -X POST https://content.dropboxapi.com/2/files/upload \
-#     --header "Authorization: Bearer $DBTOKEN" \
-#     --header "Dropbox-API-Arg: {\"path\": \"/Archive/$FILE\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
-#     --header "Content-Type: application/octet-stream" \
-#     --data-binary @"$FILE"
+
+
+
+
