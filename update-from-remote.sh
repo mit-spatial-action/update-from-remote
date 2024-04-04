@@ -14,7 +14,7 @@ while getopts "u:d:" flag; do
    ;;
    d)
    # Dropbox App Access Token
-   DBTOKEN="${OPTARG}"
+   DBTOKEN="$OPTARG"
    ;;
  esac
 done
