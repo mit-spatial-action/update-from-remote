@@ -69,7 +69,7 @@ if [ "$UPDATE" -eq 1 ]; then
             mv "$MOD_LAST_EP-$FILENAME" "archive/$MOD_LAST_EP-$FILENAME"
         fi
     } && {
-        if [[-z "$DBTOKEN"]]; then
+        if [[ -z "$DBTOKEN" ]]; then
             echo "Pushing to Dropbox archive."
             curl -X POST https://content.dropboxapi.com/2/files/upload \
                 --header "Authorization: Bearer $DBTOKEN" \
