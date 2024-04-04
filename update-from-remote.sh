@@ -37,7 +37,8 @@ fi
 
 CURL=$(curl -s -v -X HEAD "$URL" 2>&1)
 DATE=$("$CURL" 2>&1 | sed -n -e 's/< Date\: .*\, //p'  | tr -d "\t\n\r")
-DATE_EP=$(date -j -f "%d %b %Y %H:%M:%S %Z" "$DATE" +%s)
+# date -d "27 Mar 2024 15:10:59 GMT" "+%s"
+DATE_EP=$(date -d "$DATE" "+%s")
 
 # Break and log on 404 error.
 if [[ $CURL = *'404 Not Found'* ]]; then
@@ -46,7 +47,7 @@ if [[ $CURL = *'404 Not Found'* ]]; then
 fi
 
 MOD=$("$CURL" 2>&1 | sed -n -e 's/< Last-Modified\: .*\, //p' | tr -d "\t\n\r")
-MOD_EP=$(date -j -f "%d %b %Y %H:%M:%S %Z" "$MOD" +%s)
+DATE_EP=$(date -d "$MOD" "+%s")
 
 CSV_LINES=$(wc -l < "$LOG_CSV" | xargs)
 MOD_LAST_EP=$(tail -1 "$LOG_CSV" | awk -F',' '{print $6}')
