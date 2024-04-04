@@ -25,9 +25,15 @@ MOD_LAST_EP=$(tail -1 "$LOG_CSV" | awk -F',' '{print $5}')
 
 FILE=$(find . -type f -iname "$MOD_LAST_EP*")
 
-echo "Pushing to Dropbox archive."
-curl -X POST https://content.dropboxapi.com/2/files/upload \
-    --header "Authorization: Bearer $DBTOKEN" \
-    --header "Dropbox-API-Arg: {\"path\": \"/Archive/$FILE\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
-    --header "Content-Type: application/octet-stream" \
-    --data-binary @"$FILE"
+MB=$(du -m "$FILE" | grep -o -E "^[0-9]+")
+
+if [ MB > 150 ]; then
+    split $FILE
+fi
+
+# echo "Pushing to Dropbox archive."
+# curl -X POST https://content.dropboxapi.com/2/files/upload \
+#     --header "Authorization: Bearer $DBTOKEN" \
+#     --header "Dropbox-API-Arg: {\"path\": \"/Archive/$FILE\", \"mode\": \"overwrite\", \"strict_conflict\": false}" \
+#     --header "Content-Type: application/octet-stream" \
+#     --data-binary @"$FILE"
