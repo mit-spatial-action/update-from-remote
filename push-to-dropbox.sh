@@ -9,10 +9,7 @@ while getopts "d:" flag; do
     case $flag in
         d)
         # Dropbox App Access Token
-            DBTOKEN="$OPTARG"
-        else
-            exit 1
-        fi
+        DBTOKEN="$OPTARG"
         ;;
     esac
 done
