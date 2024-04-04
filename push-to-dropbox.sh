@@ -42,8 +42,8 @@ if [ mb > 150 ]; then
         --header "Dropbox-API-Arg: {\"close\":false}" \
         --header "Content-Type: application/octet-stream" \
         --data-binary @"${chunklist[0]}")
-    session_id=$("$content" | grep -oP '(?<="session_id":)(?<= )?.*(?=")' | tr -cd '[:alnum:]')
-
+    session_id=$(echo "$content" | grep -oP '(?<="session_id":)(?<= )?.*(?=")' | tr -cd '[:alnum:]:')
+    echo "$session_id"
     for item in ${chunklist[@]:1:${#chunklist[@]}-1}
     do
     curl -X POST https://content.dropboxapi.com/2/files/upload_session/append_v2 \
