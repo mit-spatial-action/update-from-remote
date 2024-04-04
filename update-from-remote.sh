@@ -44,7 +44,7 @@ if [[ $CURL = *'404 Not Found'* ]]; then
 fi
 
 MOD=$("$CURL" 2>&1 | sed -n -e 's/< Last-Modified\: .*\, //p' | tr -d "\t\n\r")
-DATE_EP=$(date -d "$MOD" "+%s")
+MOD_EP=$(date -d "$MOD" "+%s")
 
 CSV_LINES=$(wc -l < "$LOG_CSV" | xargs)
 MOD_LAST_EP=$(tail -1 "$LOG_CSV" | awk -F',' '{print $6}')
