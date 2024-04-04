@@ -37,11 +37,12 @@ if [ mb > 150 ]; then
     chunklist=($(ls chunk* | sort -d))
 
     # Open an upload session with first chunk...
-    session_id=$(curl -X POST https://content.dropboxapi.com/2/files/upload_session/start \
+    content=$(curl -X POST https://content.dropboxapi.com/2/files/upload_session/start \
         --header "Authorization: Bearer $dbtoken" \
         --header "Dropbox-API-Arg: {\"close\":false}" \
         --header "Content-Type: application/octet-stream" \
-        --data-binary @"${chunklist[0]}") | grep -o '"session_id":"[^"]*' | grep -o '[^"]*$'
+        --data-binary @"${chunklist[0]}")
+    session_id=$("$content" | grep -oP '(?<="session_id":)(?<= )?.*(?=")' | tr -cd '[:alnum:]')
 
     for item in ${chunklist[@]:1:${#chunklist[@]}-1}
     do
