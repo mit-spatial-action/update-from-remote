@@ -27,11 +27,7 @@ if [[ -z "$dbox_out_path" ]]; then
     exit 1
 fi
 
-log_csv="log.csv"
-
-mod_last_ep=$(tail -1 "$log_csv" | awk -F',' '{print $3}')
-
-file=$(find . -type f -iname "*$mod_last_ep.zip")
+file=$(find -E . -maxdepth 1 -type f  -regex ".*[0-9]+-[0-9]+.*")
 filename=$(basename "$file")
 
 mb=$(du -m "$file" | grep -o -E "^[0-9]+")
@@ -57,7 +53,7 @@ ext_files=$(curl -X POST https://api.dropboxapi.com/2/files/search_v2 \
             \"file_status\":\"active\",
             \"filename_only\":true,
             \"max_results\":20,
-            \"path\":\"\/$dbox_out_path\"
+            \"path\":\"$dbox_out_path\"
         },
         \"query\":\"${filename}\"
         }")
@@ -111,7 +107,7 @@ else
                     \"autorename\":true,
                     \"mode\":\"add\",
                     \"mute\":false,
-                    \"path\":\"/$dbox_out_path/$filename\",
+                    \"path\":\"$dbox_out_path/$filename\",
                     \"strict_conflict\":false
                 },
                 \"cursor\":{
@@ -127,23 +123,11 @@ else
         curl -X POST https://content.dropboxapi.com/2/files/upload \
             --header "Authorization: Bearer $dbox_token" \
             --header "Dropbox-API-Arg: {
-                \"path\": \"/$dbox_out_path/$filename\", 
+                \"path\": \"$dbox_out_path/$filename\", 
                 \"mode\": \"overwrite\", 
                 \"strict_conflict\": false
                 }" \
             --header "Content-Type: application/octet-stream" \
             --data-binary @"$file"
     fi
-
-    # Push CSV up as well.
-    curl -X POST https://content.dropboxapi.com/2/files/upload \
-            --header "Authorization: Bearer $dbox_token" \
-            --header "Dropbox-API-Arg: {
-                \"path\": 
-                \"/$dbox_out_path/$log_csv\", 
-                \"mode\": \"overwrite\", 
-                \"strict_conflict\": false
-                }" \
-            --header "Content-Type: application/octet-stream" \
-            --data-binary @"$log_csv" &>/dev/null
 fi
