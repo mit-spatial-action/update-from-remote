@@ -1,7 +1,10 @@
 #!/bin/sh
 
-# This script pushes file with the most recent modified date to Dropbox.
-# Requires a Dropbox Application Access Token.
+# Pushes a local file to a folder associated with a Dropbox application, which also handles the 150MB payload 
+# limit for the base upload/ endpont by splitting large files and using the upload_session/ endpoint. 
+# Handles all the stuff you'd expect (checking whether files exists on Dropbox before pushing file, etc.).
+# Requires Dropbox refresh token, app key, secret, and a path to which file will be written.
+
 ts=$(date)
 echo "$ts: Starting push-to-dropbox process."
 
