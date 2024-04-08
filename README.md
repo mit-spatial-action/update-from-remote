@@ -22,5 +22,5 @@ If you want to schedule updates on on a `crontab`, you should be able to simply 
 
 ```
 # m h dom mon dow command
-59 23 * * cd <repo_path> && bash ./update-from-remote.sh -u "<remote_file_of_interest>" && bash ./push-to-dropbox.sh
+59 23 * * cd <repo_path> && bash ./update-from-remote.sh -u "<remote_file_of_interest>" >> update-from-remote.log 2>&1 && bash ./push-to-dropbox.sh >> update-from-remote.log 2>&1
 ```
