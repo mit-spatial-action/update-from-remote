@@ -1,5 +1,5 @@
 # update-from-remote
-Lil' utilities for automatically managing recurrent downloads of remote files. Tested on macOS and Ubuntu.
+Lil' utilities for automatically managing recurrent downloads of remote files. Writen to minimize dependencies (which means clunky but functional `JSON` parsing---sorry, [JQ](https://jqlang.github.io/jq/) stans). Tested on macOS and Ubuntu.
 
 1. `update-from-remote.sh` checks the last modified date of a remote file and compares it to the previous download in order to determine whether there has been an update on the remote. (This is handled by simpty writing a timestamp into the filename.) If the remote has been updated, it downloads the updated file and moves the outdated local copy to an archive folder.
 2. `push-to-dropbox.sh` pushes a local file to a folder associated with a Dropbox application, which also handles the 150MB payload limit for the base [`upload/`](https://www.dropbox.com/developers/documentation/http/documentation#files-upload) endpont by splitting large files and using the [`upload_session/`](https://www.dropbox.com/developers/documentation/http/documentation#files-upload_session-append) endpoint. Handles all the stuff you'd expect (checking whether files exists on Dropbox before pushing file, etc.).
