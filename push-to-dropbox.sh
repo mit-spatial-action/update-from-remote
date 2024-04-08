@@ -67,7 +67,7 @@ ext_files=$(curl -X POST https://api.dropboxapi.com/2/files/search_v2 \
         \"query\":\"${filename}\"
         }")
 
-if ! [[ -z "$files" ]]; then
+if ! [[ -z "$ext_files" ]]; then
     echo "File $filename already exists"
     exit 0
 else
