@@ -4,7 +4,7 @@ Lil' utility that pulls the last modified date of a remote file and checks it ag
 Currently used to create an archive of the [MassGIS Property Tax Parcels database](https://www.mass.gov/info-details/massgis-data-property-tax-parcels). Archive is available in [this Dropbox folder](https://www.dropbox.com/scl/fo/8tb0boh3ejckizdx3w9q8/h?rlkey=ye2s8zgs16dif81usc2jhx8fm&dl=0). We began using this script in March 2024, so updates will be ongoing (approximately monthly).
 
 ## Configuration
-`update-from-remote.sh` has one required option (`-u`) which expects a remote file URL. An optional argument (`-a`) allows you to specify a local archive directory. (By default, this is set to `'.archive/'`). To use `push-to-dropbox.sh`, you'll have to create a `.env` file, which includes the following:
+`update-from-remote.sh` has one required option (`-u`) which expects a remote file URL. An optional argument (`-a`) allows you to specify a local archive directory. (By default, this is set to `'./archive/'`). To use `push-to-dropbox.sh`, you'll have to create a `.env` file, which includes the following:
 
 ```bash
 dbox_refresh_token=""
