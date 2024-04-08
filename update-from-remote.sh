@@ -6,6 +6,9 @@
 # been updated, downloads the updated file and moves the outdated
 # local copy to an archive folder.
 
+ts=$(date)
+echo "$ts: Starting update-from-remote process."
+
 url=''
 
 set -a            
@@ -74,5 +77,7 @@ if ! [ -f "$new_file" ]; then
     }
 else
     echo "No update to the file since last run."
-    exit 0
 fi
+
+ts=$(date)
+echo "$ts: update-from-remote finished."

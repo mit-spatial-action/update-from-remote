@@ -2,6 +2,8 @@
 
 # This script pushes file with the most recent modified date to Dropbox.
 # Requires a Dropbox Application Access Token.
+ts=$(date)
+echo "$ts: Starting push-to-dropbox process."
 
 set -a            
 source .env
@@ -69,6 +71,8 @@ ext_files=$(curl -X POST https://api.dropboxapi.com/2/files/search_v2 \
 
 if ! [[ -z "$ext_files" ]]; then
     echo "File $filename already exists"
+    ts=$(date)
+    echo "$ts: push-to-dropbox finished."
     exit 0
 else
     if [ "$mb" -ge 150 ]; then
@@ -138,3 +142,6 @@ else
             --data-binary @"$file"
     fi
 fi
+
+ts=$(date)
+echo "$ts: push-to-dropbox finished."
