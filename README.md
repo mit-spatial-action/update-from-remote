@@ -9,7 +9,7 @@ Currently used to create an archive of the [MassGIS Property Tax Parcels databas
 ## Configuration
 `update-from-remote.sh` has one required option (`-u`) which expects a remote file URL. An optional argument (`-a`) allows you to specify a local archive directory. (By default, this is set to `'./archive/'`). To use `push-to-dropbox.sh`, you'll have to create a `.env` file, which includes the following:
 
-```bash
+```
 dbox_refresh_token=""
 dbox_app_key=""
 dbox_app_secret=""
@@ -17,3 +17,10 @@ dbox_out_path=""
 ```
 
 You must first [create a Dropbox application](https://www.dropbox.com/developers/apps/create?_tk=pilot_lp&_ad=ctabtn1&_camp=create). Because this script is built to run on a server without intervention, you'll also need to set up a Dropbox refresh token, which is necessary because the API has moved to an `OAuth 2.0` authentication system for its API. See the [Dropbox OAuth documentation here](https://developers.dropbox.com/oauth-guide). Application key and secret are available through the Application dashboard.
+
+If you want to schedule updates on on a `crontab`, you should be able to simply use the below, obviously modifying the schedule for your needs.
+
+```
+# m h dom mon dow command
+59 23 * * cd <repo_path> && bash ./update-from-remote.sh -u "<remote_file_of_interest>" && bash ./push-to-dropbox.sh
+```
