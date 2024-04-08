@@ -63,7 +63,7 @@ ext_files=$(curl -X POST https://api.dropboxapi.com/2/files/search_v2 \
         \"options\":{
             \"file_status\":\"active\",
             \"filename_only\":true,
-            \"max_results\":20,
+            \"max_results\":1,
             \"path\":\"$dbox_out_path\"
         },
         \"query\":\"${filename}\"
