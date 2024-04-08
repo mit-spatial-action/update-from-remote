@@ -30,9 +30,9 @@ if [[ -z "$dbox_out_path" ]]; then
 fi
 
 if [ "$(uname)" == "Darwin" ]; then
-    file=$(find -E . -maxdepth 1 -type f  -regex "./.*[0-9]+-[0-9]+.*")
+    file=$(find -E . -maxdepth 1 -type f  -regex "./.*[0-9]{8}-[0-9]{6}.*")
 else
-    file=$(find . -maxdepth 1 -type f  -regex "./.*[0-9]+-[0-9]+.*")
+    file=$(find . -maxdepth 1 -type f -regextype posix-extended -regex "./.*[0-9]{8}-[0-9]{6}.*")
 fi
 
 if [ -z "$file" ]; then
