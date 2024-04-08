@@ -46,11 +46,11 @@ date=$("$curl" 2>&1 | sed -n -e 's/< Date\: .*\, //p'  | tr -d "\t\n\r")
 mod=$("$curl" 2>&1 | sed -n -e 's/< Last-Modified\: .*\, //p' | tr -d "\t\n\r")
 
 if [ "$(uname)" == "Darwin" ]; then
-    date_ep=$(date -j -f "%d %b %Y %H:%M:%S %Z" "$date" "+%Y%m%d-%H%M%S")
-    mod_ep=$(date -j -f "%d %b %Y %H:%M:%S %Z" "$mod" "+%Y%m%d-%H%M%S")
+    date_ep=$(date -j -fu "%d %b %Y %H:%M:%S %Z" "$date" "+%Y%m%d-%H%M%S")
+    mod_ep=$(date -j -fu "%d %b %Y %H:%M:%S %Z" "$mod" "+%Y%m%d-%H%M%S")
 else
-    date_ep=$(date -d "$date" "%Y%m%d-%H%M%S")
-    mod_ep=$(date -d "$mod" "%Y%m%d-%H%M%S")
+    date_ep=$(date -d "$date" "+%Y%m%d-%H%M%S")
+    mod_ep=$(date -d "$mod" "+%Y%m%d-%H%M%S")
 fi
 
 csv_lines=$(wc -l < "$log_csv" | xargs)
