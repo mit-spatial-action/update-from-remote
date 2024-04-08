@@ -4,6 +4,8 @@
 # in order to determine whether there has been an update on the remote. (This is handled
 # by simpty writing a timestamp into the filename.) If the remote has been updated, it 
 # downloads the updated file and moves the outdated local copy to an archive folder.
+# Requires user to pass remote url via either -u flag or .env file. (The former will override
+# the latter).
 
 ts=$(date)
 echo "$ts: Starting update-from-remote process."
