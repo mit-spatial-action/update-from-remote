@@ -41,7 +41,6 @@ token_content=$(curl https://api.dropbox.com/oauth2/token \
 
 dbox_token=$(echo "$token_content" | grep -o '"access_token": "[^"]*' | grep -o '[^"]*' | tail -n1)
 
-# filename="1711552257-MassGIS_L3_Parcels_gdb.zip"
 ext_files=$(curl -X POST https://api.dropboxapi.com/2/files/search_v2 \
     --header "Authorization: Bearer $dbox_token" \
     --header "Content-Type: application/json" \
