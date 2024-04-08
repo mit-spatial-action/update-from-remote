@@ -44,7 +44,6 @@ fi
 
 date=$("$curl" 2>&1 | sed -n -e 's/< Date\: .*\, //p'  | tr -d "\t\n\r")
 mod=$("$curl" 2>&1 | sed -n -e 's/< Last-Modified\: .*\, //p' | tr -d "\t\n\r")
-echo "$date"
 
 if [ "$(uname)" == "Darwin" ]; then
     date_ep=$(date -j -f "%d %b %Y %H:%M:%S %Z" "$date" "+%Y%m%d-%H%M%S")
@@ -76,9 +75,9 @@ if [ "$update" -eq 1 ]; then
 
         curl -o "${filename_only}_${mod_ep}.${extension}" "$url"
         # Move outdated file to archive folder.
-        if [ -f "${filename_only}_${mod_ep}.${extension}" ]; then
+        if [ -f "${filename_only}_${mod_last_ep}.${extension}" ]; then
             mkdir -p 'archive'
-            mv "${filename_only}_${mod_ep}.${extension}" "archive/${filename_only}_${mod_ep}.${extension}"
+            mv "${filename_only}_${mod_last_ep}.${extension}" "archive/${filename_only}_${mod_last_ep}.${extension}"
         fi
     }
 fi
